@@ -20,13 +20,24 @@ exports.getTasks = async (req, res) => {
     // Build sort dynamically
     const sortOptions = {};
     if (sort) {
-      sortOptions[sort] = order === "asc" ? -1 : 1;
+      sortOptions[sort] = order === "asc" ? 1 : -1;
     }
     const tasks = await Task.find(filter)
       .sort(sortOptions)
       .skip(skip)
       .limit(limit);
-    res.json(tasks);
+
+    // Get total count for pagination
+    const totalTasks = await Task.countDocuments(filter);
+    res.json({
+      tasks,
+      pagination: {
+        page,
+        limit,
+        totalTasks,
+        totalPages: Math.ceil(totalTasks / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error fetching tasks", error });
   }
