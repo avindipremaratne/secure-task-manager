@@ -1,23 +1,28 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware");
-const {
-  getTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-} = require("../controllers/taskController");
+const Task = require("../models/Task");
+
 const router = express.Router();
 
-// Apply authentication middleware to all task routes
-router.use(authMiddleware);
+// Create a new task
+router.post("/", authMiddleware, async (req, res) => {
+  const task = await Task.create({ ...req.body, userId: req.user._id });
+  res.status(201).json(task);
+});
 
-// Route to get all tasks
-router.get("/", getTasks);
-// Route to create a new task
-router.post("/", createTask);
-// Route to update an existing task
-router.put("/:id", updateTask);
-// Route to delete a task
-router.delete("/:id", deleteTask);
+// Update a task
+router.put("/:id", authMiddleware, async (req, res) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, userId: req.user._id },
+    req.body,
+    { new: true },
+  );
+  res.json(task);
+});
 
+// Delete a task
+router.delete("/:id", authMiddleware, async (req, res) => {
+  await Task.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+  res.json({ message: "Task deleted" });
+});
 module.exports = router;
