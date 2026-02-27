@@ -51,3 +51,25 @@ exports.logout = (req, res) => {
   // For JWT, logout is handled on the client side by deleting the token
   res.json({ message: "User logged out successfully" });
 };
+
+exports.devResetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: "email and newPassword are required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: "Password reset (dev)" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
