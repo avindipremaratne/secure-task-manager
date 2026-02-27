@@ -1,14 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
-function DashboardPlaceholder() {
-  return <div className="p-6">Dashboard (next)</div>;
-}
-
-function RegisterPlaceholder() {
-  return <div className="p-6">Register (next)</div>;
-}
+import Dashboard from "./pages/Dashboard";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -25,7 +18,7 @@ export default function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPlaceholder />
+              <Dashboard />
             </ProtectedRoute>
           }
         />
