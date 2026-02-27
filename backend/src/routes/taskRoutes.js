@@ -4,6 +4,15 @@ const Task = require("../models/Task");
 
 const router = express.Router();
 
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const tasks = await Task.find({ userId: req.user.id });
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Create a new task
 router.post("/", authMiddleware, async (req, res) => {
   try {
