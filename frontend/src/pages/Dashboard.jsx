@@ -1,10 +1,15 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api/client";
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+  });
 
   useEffect(() => {
     fetchTasks();
@@ -21,17 +26,73 @@ export default function Dashboard() {
     }
   };
 
+  const handleChange = (e) => {
+    setNewTask({
+      ...newTask,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.post("/api/tasks", newTask);
+
+      setTasks([...tasks, res.data]);
+      setNewTask({ title: "", description: "" });
+    } catch (err) {
+      console.error("Failed to create task:", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/tasks/${id}`);
+      setTasks(tasks.filter((task) => task._id !== id));
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading Tasks...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
 
   return (
- <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Your Tasks</h1>
 
+        <form onSubmit={handleSubmit} className="mb-6">
+          <input
+            type="text"
+            name="title"
+            placeholder="Task title"
+            value={newTask.title}
+            onChange={handleChange}
+            className="border p-2 mr-2 rounded"
+            required
+          />
+          <input
+            type="text"
+            name="description"
+            placeholder="Task description"
+            value={newTask.description}
+            onChange={handleChange}
+            className="border p-2 mr-2 rounded"
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Add Task
+          </button>
+        </form>
+
         {tasks.length === 0 ? (
           <div className="bg-white p-6 rounded-xl shadow">
-            <p className="text-gray-700">No tasks yet. Create your first one!</p>
+            <p className="text-gray-700">
+              No tasks yet. Create your first one!
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -58,9 +119,22 @@ export default function Dashboard() {
                     >
                       {task.status}
                     </span>
+                    <button
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this task?",
+                          )
+                        ) {
+                          handleDelete(task._id);
+                        }
+                      }}
+                      className="px-3 py-1 text-sm rounded-full bg-red-100 text-red-700"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
-
                 {task.dueDate && (
                   <div className="text-sm text-gray-500 ml-4">
                     Due: {new Date(task.dueDate).toLocaleDateString()}
@@ -72,5 +146,5 @@ export default function Dashboard() {
         )}
       </div>
     </div>
-);
+  );
 }

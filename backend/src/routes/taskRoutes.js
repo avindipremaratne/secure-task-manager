@@ -16,13 +16,12 @@ router.get("/", authMiddleware, async (req, res) => {
 // Create a new task
 router.post("/", authMiddleware, async (req, res) => {
   try {
-    if (!req.body.title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
-    const task = await Task.create({ ...req.body, userId: req.user.id });
-    res.status(201).json(task);
+    const { title, description } = req.body;
+    const task = new Task({ title, description, userId: req.user.id });
+    const savedTask = await task.save();
+    res.status(201).json(savedTask);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -46,7 +45,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 // Delete a task
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
-    await Task.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
