@@ -54,6 +54,16 @@ export default function Dashboard() {
     }
   };
 
+  const handleToggle = async (id, currentStatus) => {
+    const newStatus = currentStatus === "completed" ? "pending" : "completed";
+    try {
+      const res = await api.put(`/api/tasks/${id}`, { status: newStatus });
+      setTasks(tasks.map((task) => (task._id === id ? res.data : task)));
+    } catch (err) {
+      console.error("Failed to update task:", err);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading Tasks...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
 
@@ -119,6 +129,14 @@ export default function Dashboard() {
                     >
                       {task.status}
                     </span>
+                    <button
+                      onClick={() => handleToggle(task._id, task.status)}
+                      className="px-3 py-1 text-sm rounded-full bg-gray-200 text-gray-700"
+                    >
+                      {task.status === "completed"
+                        ? "Mark Pending"
+                        : "Mark Complete"}
+                    </button>
                     <button
                       onClick={() => {
                         if (
