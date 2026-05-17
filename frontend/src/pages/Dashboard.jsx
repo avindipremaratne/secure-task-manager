@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
+import Navbar from "../components/Navbar";
 
 export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -69,34 +70,38 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      <Navbar />
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Your Tasks</h1>
+        <h1 className="text-2xl font-bold mb-6 text-gray-800">Your Tasks</h1>
 
-        <form onSubmit={handleSubmit} className="mb-6">
-          <input
-            type="text"
-            name="title"
-            placeholder="Task title"
-            value={newTask.title}
-            onChange={handleChange}
-            className="border p-2 mr-2 rounded"
-            required
-          />
-          <input
-            type="text"
-            name="description"
-            placeholder="Task description"
-            value={newTask.description}
-            onChange={handleChange}
-            className="border p-2 mr-2 rounded"
-          />
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Add Task
-          </button>
-        </form>
+        <div className="bg-white p-6 rounded-xl shadow mb-6">
+          <h2 className="text-lg font-semibold mb-4">Add New Task</h2>
+          <form onSubmit={handleSubmit} className="flex gap-3">
+            <input
+              type="text"
+              name="title"
+              placeholder="Task title"
+              value={newTask.title}
+              onChange={handleChange}
+              className="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
+            />
+            <input
+              type="text"
+              name="description"
+              placeholder="Task description"
+              value={newTask.description}
+              onChange={handleChange}
+              className="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg transition-colors"
+            >
+              Add Task
+            </button>
+          </form>
+        </div>
 
         {tasks.length === 0 ? (
           <div className="bg-white p-6 rounded-xl shadow">
@@ -112,12 +117,28 @@ export default function Dashboard() {
                 className="bg-white p-4 rounded-xl shadow flex justify-between items-start"
               >
                 <div>
-                  <h2 className="text-lg font-semibold">{task.title}</h2>
+                  <h2
+                    className={`text-lg font-semibold ${
+                      task.status === "completed"
+                        ? "line-through text-gray-400"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {task.title}
+                  </h2>
                   <p className="text-sm text-gray-500 mt-1">
                     {task.description || "No description"}
                   </p>
                   <div className="flex gap-2 mt-3">
-                    <span className="px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-700">
+                    <span
+                      className={`px-3 py-1 text-sm rounded-full ${
+                        task.priority === "high"
+                          ? "bg-red-100 text-red-700"
+                          : task.priority === "medium"
+                            ? "bg-orange-100 text-orange-700"
+                            : "bg-green-100 text-green-700"
+                      }`}
+                    >
                       {task.priority}
                     </span>
                     <span
