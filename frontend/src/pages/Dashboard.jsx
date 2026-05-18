@@ -6,6 +6,7 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [newTask, setNewTask] = useState({
     title: "",
@@ -65,6 +66,21 @@ export default function Dashboard() {
     }
   };
 
+  const handleGenerateDescription = async () => {
+    if (!newTask.title) return;
+    setAiLoading(true);
+    try {
+      const res = await api.post("/api/ai/generate-description", {
+        title: newTask.title,
+      });
+      setNewTask({ ...newTask, description: res.data.description });
+    } catch (err) {
+      console.error("Failed to generate description:", err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   if (loading) return <div className="p-6">Loading Tasks...</div>;
   if (error) return <div className="p-6 text-red-600">{error}</div>;
 
@@ -76,30 +92,40 @@ export default function Dashboard() {
 
         <div className="bg-white p-6 rounded-xl shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">Add New Task</h2>
-          <form onSubmit={handleSubmit} className="flex gap-3">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
             <input
               type="text"
               name="title"
               placeholder="Task title"
               value={newTask.title}
               onChange={handleChange}
-              className="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 px-3 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
-            <input
-              type="text"
+            <textarea
               name="description"
               placeholder="Task description"
               value={newTask.description}
               onChange={handleChange}
-              className="flex-1 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              rows={3}
+              className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg transition-colors"
-            >
-              Add Task
-            </button>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={handleGenerateDescription}
+                disabled={aiLoading || !newTask.title}
+                className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {aiLoading ? "Generating..." : "Generate Description"}
+              </button>
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg transition-colors"
+              >
+                Add Task
+              </button>
+            </div>
           </form>
         </div>
 
