@@ -264,7 +264,7 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-500 mt-1">
                         {task.description || "No description"}
                       </p>
-                      <div className="flex gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2 mt-3">
                         <span
                           className={`px-3 py-1 text-sm rounded-full ${
                             task.priority === "high"
