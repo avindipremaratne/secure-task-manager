@@ -11,6 +11,8 @@ export default function Dashboard() {
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
+    priority: "medium",
+    dueDate: "",
   });
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function Dashboard() {
   const fetchTasks = async () => {
     try {
       const res = await api.get("/api/tasks");
-      setTasks(res.data);
+      setTasks(res.data.tasks || res.data);
     } catch (e) {
       setError("Failed to load tasks");
     } finally {
@@ -41,7 +43,12 @@ export default function Dashboard() {
       const res = await api.post("/api/tasks", newTask);
 
       setTasks([...tasks, res.data]);
-      setNewTask({ title: "", description: "" });
+      setNewTask({
+        title: "",
+        description: "",
+        priority: "medium",
+        dueDate: "",
+      });
     } catch (err) {
       console.error("Failed to create task:", err);
     }
@@ -110,6 +117,33 @@ export default function Dashboard() {
               rows={3}
               className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
+            <div className="flex gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm text-gray-500">Priority</label>
+                <select
+                  name="priority"
+                  value={newTask.priority}
+                  onChange={handleChange}
+                  className="w-36 border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+              <div className="w-48 flex flex-col gap-1">
+                <label className="text-sm text-gray-500">
+                  Due Date (optional)
+                </label>
+                <input
+                  type="date"
+                  name="dueDate"
+                  value={newTask.dueDate}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+            </div>
             <div className="flex gap-3 justify-end">
               <button
                 type="button"

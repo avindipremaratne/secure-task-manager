@@ -6,8 +6,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-module.exports = app;
-
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
@@ -16,3 +14,5 @@ app.use("/api/tasks", taskRoutes);
 
 const aiRoutes = require("./routes/aiRoutes");
 app.use("/api/ai", aiRoutes);
+
+module.exports = app;
