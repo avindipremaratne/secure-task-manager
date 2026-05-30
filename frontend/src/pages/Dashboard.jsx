@@ -64,7 +64,12 @@ export default function Dashboard() {
   };
 
   const handleToggle = async (id, currentStatus) => {
-    const newStatus = currentStatus === "completed" ? "pending" : "completed";
+    const newStatus =
+      currentStatus === "pending"
+        ? "in-progress"
+        : currentStatus === "in-progress"
+          ? "completed"
+          : "pending";
     try {
       const res = await api.put(`/api/tasks/${id}`, { status: newStatus });
       setTasks(tasks.map((task) => (task._id === id ? res.data : task)));
@@ -205,7 +210,9 @@ export default function Dashboard() {
                       className={`px-3 py-1 text-sm rounded-full ${
                         task.status === "completed"
                           ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
+                          : task.status === "in-progress"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
                       {task.status}
@@ -216,7 +223,9 @@ export default function Dashboard() {
                     >
                       {task.status === "completed"
                         ? "Mark Pending"
-                        : "Mark Complete"}
+                        : task.status === "in-progress"
+                          ? "Mark Complete"
+                          : "Mark In Progress"}
                     </button>
                     <button
                       onClick={() => {
