@@ -320,7 +320,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     {task.dueDate && (
-                      <div className="text-sm text-gray-500 ml-4">
+                      <div className="text-sm text-gray-500 ml-4 whitespace-nowrap">
                         Due: {new Date(task.dueDate).toLocaleDateString()}
                       </div>
                     )}
